@@ -5,10 +5,9 @@ import rs.rbt.internship.database.model.UsedVacation
 import rs.rbt.internship.database.repository.UsedVacationRepository
 
 @Service
-class UsedVacationServices(var usedVacationRepository: UsedVacationRepository) {
+class UsedVacationService(var usedVacationRepository: UsedVacationRepository) {
 
-    fun saveUsedVacations(usedVacation: MutableList<UsedVacation>){
+    fun saveUsedVacations(usedVacation: MutableList<UsedVacation>) {
         usedVacationRepository.saveAll(usedVacation)
     }
-
 }
