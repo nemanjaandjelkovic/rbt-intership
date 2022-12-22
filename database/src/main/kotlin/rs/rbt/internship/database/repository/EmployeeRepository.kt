@@ -6,4 +6,11 @@ import rs.rbt.internship.database.model.Employee
 
 @Repository
 interface EmployeeRepository:JpaRepository<Employee,Long> {
+    fun findEmployeeByEmail(email:String):Employee
+
+
+
+
+
+
 }

@@ -6,4 +6,7 @@ import rs.rbt.internship.database.model.UsedVacation
 
 @Repository
 interface UsedVacationRepository:JpaRepository<UsedVacation,Long> {
+    override fun <S : UsedVacation?> saveAll(entities: MutableIterable<S>): MutableList<S> {
+        TODO("Not yet implemented")
+    }
 }
