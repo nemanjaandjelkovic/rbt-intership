@@ -15,7 +15,6 @@ data class Employee(
     var password: String = "",
     @OneToMany(mappedBy = "employee")
     var usedVacationList: MutableList<UsedVacation> = mutableListOf(),
-    @Column(name = "vacation_day_per_year")
-    @ElementCollection
-    var vacationDayPerYear: MutableMap<String, Int> = mutableMapOf()
+    @OneToMany(mappedBy = "employee")
+    var vacationDayPerYear: MutableList<VacationDayPerYear> = mutableListOf()
 )

@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Service
-class CsvServices() {
+class CsvParserService() {
     @Autowired
     lateinit var employeeServices: EmployeeService
     @Autowired
@@ -59,7 +59,7 @@ class CsvServices() {
         val usedVacationMutableList: MutableList<UsedVacation> = mutableListOf()
         val csvRecords: Iterable<CSVRecord> = csvParser.records
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
-        var day:Int=0
+        var day:MutableMap<String,Int> = mutableMapOf()
         csvRecords.forEach {
             val usedVacation: UsedVacation = UsedVacation(
                 dateStart = LocalDate.parse(it.get(1), formatter),
@@ -68,6 +68,7 @@ class CsvServices() {
             )
             day=adminService.getDaysBetweenDate(usedVacation.dateStart,usedVacation.dateEnd)
             usedVacationMutableList.add(usedVacation)
+            println("$day ${usedVacation.dateStart} ${usedVacation.dateEnd}")
         }
         return usedVacationMutableList
     }
