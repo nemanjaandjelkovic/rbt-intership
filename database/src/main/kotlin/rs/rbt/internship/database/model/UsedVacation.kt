@@ -1,5 +1,6 @@
 package rs.rbt.internship.database.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -16,5 +17,5 @@ class UsedVacation(
     @ManyToOne
     @JoinColumn(name = "employee_id")
     var employee: Employee
-
-)
+) {
+}
