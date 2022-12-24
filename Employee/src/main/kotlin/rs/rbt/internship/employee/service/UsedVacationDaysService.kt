@@ -1,4 +1,4 @@
-package rs.rbt.internship.admin.service
+package rs.rbt.internship.employee.service
 
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,7 +17,7 @@ class UsedVacationDaysService {
         return daysWithOutWeekend
     }
 
-    fun getDaysBetweenDateSameYear(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
+    private fun getDaysBetweenDateSameYear(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
         var dates: MutableList<LocalDate> = mutableListOf()
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
         if (!dateStart.equals(dateEnd)) {
@@ -32,7 +32,7 @@ class UsedVacationDaysService {
         return daysWithOutWeekend
     }
 
-    fun checkDaysWithoutWeekend(
+   private fun checkDaysWithoutWeekend(
         daysPerYear: MutableMap<String, Int>,
         dates: MutableList<LocalDate>
     ): MutableMap<String, Int> {
@@ -45,7 +45,7 @@ class UsedVacationDaysService {
         return daysPerYear
     }
 
-    fun getDaysBetweenDateDifferentYear(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
+    private fun getDaysBetweenDateDifferentYear(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
         val middleYear: LocalDate = LocalDate.of(dateEnd.year, 1, 1)
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
 

@@ -18,4 +18,9 @@ class VacationDayPerYearService {
     {
         vacationDayPerYearRepository.updateVacationDayPerYear(days,year,employee.id)
     }
+
+    fun findByYearAndEmployeeId(year:String,employee:Employee):VacationDayPerYear
+    {
+        return vacationDayPerYearRepository.findByYearEqualsAndEmployeeIdEquals(year,employee.id)
+    }
 }

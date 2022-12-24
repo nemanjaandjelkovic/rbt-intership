@@ -17,9 +17,14 @@ class UsedVacationService() {
         usedVacationRepository.saveAll(usedVacation)
     }
 
-    fun dates(dateStart:LocalDate,dateEnd:LocalDate,employee:Employee):MutableList<UsedVacation>
+    fun saveUsedVacation(usedVacation: UsedVacation)
     {
-        return usedVacationRepository.findAllByDateStartGreaterThanEqualAndDateEndLessThanEqualAndEmployeeLike(dateStart,dateEnd,employee)
+        usedVacationRepository.save(usedVacation)
+    }
+
+    fun dates(dateStart:LocalDate,dateEnd:LocalDate,employeeId:Long):MutableList<UsedVacation>
+    {
+        return usedVacationRepository.findAllByDateStartGreaterThanEqualAndDateEndLessThanEqualAndEmployeeIdEquals(dateStart,dateEnd,employeeId)
     }
     fun dates2(dateStart:LocalDate,dateEnd:LocalDate,employee:Employee):MutableList<UsedVacation>
     {

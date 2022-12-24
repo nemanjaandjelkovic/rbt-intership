@@ -12,9 +12,10 @@ interface UsedVacationRepository:JpaRepository<UsedVacation,Long> {
         TODO("Not yet implemented")
     }
 
-    fun findAllByDateStartGreaterThanEqualAndDateEndLessThanEqualAndEmployeeLike(dateStart: LocalDate, dateEnd:LocalDate,employee:Employee):MutableList<UsedVacation>
+    fun findAllByDateStartGreaterThanEqualAndDateEndLessThanEqualAndEmployeeIdEquals(dateStart: LocalDate, dateEnd:LocalDate,employeeId:Long):MutableList<UsedVacation>
 
     fun findAllByDateStartGreaterThanEqualAndDateEndLessThanEqual(dateStart: LocalDate, dateEnd:LocalDate):MutableList<UsedVacation>
+
 
 
 

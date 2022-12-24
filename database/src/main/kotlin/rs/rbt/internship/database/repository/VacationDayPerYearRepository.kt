@@ -21,4 +21,7 @@ interface VacationDayPerYearRepository : JpaRepository<VacationDayPerYear, Long>
         @Param("year") year: String,
         @Param("employee_id") employeeId: Long
     )
+
+    fun findByYearEqualsAndEmployeeIdEquals(year:String, employeeId:Long):VacationDayPerYear
+
 }

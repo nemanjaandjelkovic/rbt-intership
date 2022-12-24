@@ -1,5 +1,6 @@
 package rs.rbt.internship.database.model
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 
 @Entity
@@ -13,6 +14,7 @@ data class VacationDayPerYear(
     @Column(name = "days")
     var day: Int=0,
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "employee_id")
     var employee: Employee=Employee()
 )

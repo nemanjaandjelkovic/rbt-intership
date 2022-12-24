@@ -1,5 +1,6 @@
 package rs.rbt.internship.database.model
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import java.time.LocalDate
@@ -15,6 +16,8 @@ class UsedVacation(
     @Column(name = "date_end")
     var dateEnd: LocalDate,
     @ManyToOne
+    //@JsonIgnore
+    @JsonBackReference
     @JoinColumn(name = "employee_id")
     var employee: Employee
 ) {

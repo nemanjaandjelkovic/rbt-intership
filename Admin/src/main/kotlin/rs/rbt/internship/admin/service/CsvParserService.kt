@@ -23,10 +23,10 @@ class CsvParserService {
     lateinit var employeeServices: EmployeeService
 
     @Autowired
-    lateinit var adminService: AdminService
+    lateinit var usedVacationDayPerYearService: VacationDayPerYearService
 
     @Autowired
-    lateinit var usedVacationDayPerYearService: VacationDayPerYearService
+    lateinit var usedVacationDaysService: UsedVacationDaysService
     fun uploadCsvEmployee(file: MultipartFile): MutableList<Employee> {
 
         val fileReader: BufferedReader = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
@@ -71,7 +71,7 @@ class CsvParserService {
                 dateEnd = LocalDate.parse(it.get(2), formatter),
                 employee = employeeServices.findEmployeeByEmail(it.get(0))
             )
-            day = adminService.getDaysBetweenDate(usedVacation.dateStart, usedVacation.dateEnd)
+            day = usedVacationDaysService.getDaysBetweenDate(usedVacation.dateStart, usedVacation.dateEnd)
             usedVacationMutableList.add(usedVacation)
             day.forEach {
                 usedVacationDayPerYearService.updateVacationDayPerYears(it.value, it.key, usedVacation.employee)

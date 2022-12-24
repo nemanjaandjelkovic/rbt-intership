@@ -4,9 +4,12 @@ import org.apache.commons.validator.routines.DateValidator
 import org.apache.commons.validator.routines.EmailValidator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import rs.rbt.internship.database.model.Employee
 import rs.rbt.internship.database.model.UsedVacation
+import rs.rbt.internship.database.model.VacationDayPerYear
 import rs.rbt.internship.database.service.EmployeeService
 import rs.rbt.internship.database.service.UsedVacationService
+import rs.rbt.internship.database.service.VacationDayPerYearService
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -17,8 +20,12 @@ class EmployeeBusinessService {
 
     @Autowired
     lateinit var usedVacationService: UsedVacationService
+
     @Autowired
     lateinit var usedVacationDaysService: UsedVacationDaysService
+
+    @Autowired
+    lateinit var vacationDayPerYearService: VacationDayPerYearService
 
     fun showListRecordsOfUsedVacation(
         dateStart: String,
@@ -73,7 +80,21 @@ class EmployeeBusinessService {
     ) {
         if (parametersValid(dateStart, dateEnd, employeeEmail)) {
             val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
-             usedVacationDaysService.getDaysBetweenDate(dateStartEnd[0], dateStartEnd[1])
+            val yearsDay: MutableMap<String, Int> =
+                usedVacationDaysService.getDaysBetweenDate(dateStartEnd[0], dateStartEnd[1])
+            val employee: Employee = employeeService.findEmployeeByEmail(employeeEmail)
+            lateinit var vacationDayPerYear: VacationDayPerYear
+            var newDay: Int = 0
+            yearsDay.forEach { k, v ->
+                vacationDayPerYear = vacationDayPerYearService.findByYearAndEmployeeId(k, employee)
+                newDay = vacationDayPerYear.day - v
+                if (newDay >= 0) {
+                    vacationDayPerYearService.updateVacationDayPerYears(newDay, k, employee)
+                    usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
+                } else {
+                    //exception
+                }
+            }
         }
     }
 }
