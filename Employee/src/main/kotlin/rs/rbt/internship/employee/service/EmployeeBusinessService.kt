@@ -1,15 +1,20 @@
 package rs.rbt.internship.employee.service
 
+import jakarta.servlet.http.HttpServletResponse
 import org.apache.commons.validator.routines.DateValidator
 import org.apache.commons.validator.routines.EmailValidator
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import rs.rbt.internship.database.model.Employee
 import rs.rbt.internship.database.model.UsedVacation
 import rs.rbt.internship.database.model.VacationDayPerYear
 import rs.rbt.internship.database.service.EmployeeService
 import rs.rbt.internship.database.service.UsedVacationService
 import rs.rbt.internship.database.service.VacationDayPerYearService
+import java.net.http.HttpResponse.ResponseInfo
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -73,6 +78,7 @@ class EmployeeBusinessService {
         return dates
     }
 
+
     fun addVacation(
         dateStart: String,
         dateEnd: String,
@@ -93,6 +99,10 @@ class EmployeeBusinessService {
                     usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
                 } else {
                     //exception
+                    println("Nemate dovoljno slobodnih dana")
+                    throw ResponseStatusException(
+                            HttpStatus.FORBIDDEN,"Nemate dovoljno slobodnih dana odmora");
+
                 }
             }
         }

@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter
 
 @Service
 class CsvParserService {
+    //PROVERA CSV PODATKA PRE RADA!!!!!
     @Autowired
     lateinit var employeeServices: EmployeeService
 
@@ -72,12 +73,22 @@ class CsvParserService {
                 employee = employeeServices.findEmployeeByEmail(it.get(0))
             )
             day = usedVacationDaysService.getDaysBetweenDate(usedVacation.dateStart, usedVacation.dateEnd)
-            println("test $day")
-            usedVacationMutableList.add(usedVacation)
+            var yearDayLeft: VacationDayPerYear = VacationDayPerYear()
+
             day.forEach {
-                usedVacationDayPerYearService.updateVacationDayPerYears(it.value, it.key, usedVacation.employee)
+                try {
+                    yearDayLeft = usedVacationDayPerYearService.findByYearAndEmployeeId(it.key, usedVacation.employee)
+                    if (yearDayLeft.day - it.value >= 0 && it.key == yearDayLeft.year) {
+                        usedVacationMutableList.add(usedVacation)
+                        usedVacationDayPerYearService.updateVacationDayPerYears(it.value, it.key, usedVacation.employee)
+                    }
+                } catch (e: Exception) {
+                    println(e.message)
+                    println("${it.key} ${it.value} ${yearDayLeft.day} ${usedVacation.employee.email} nije moguce oduzeti posto nema dovoljno slobodnih dana za tu godinu")
+
+                }
+
             }
-            println("$day ${usedVacation.dateStart} ${usedVacation.dateEnd}")
         }
         return usedVacationMutableList
     }
