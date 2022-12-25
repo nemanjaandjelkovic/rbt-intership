@@ -16,6 +16,8 @@ interface UsedVacationRepository:JpaRepository<UsedVacation,Long> {
 
     fun findAllByDateStartGreaterThanEqualAndDateEndLessThanEqual(dateStart: LocalDate, dateEnd:LocalDate):MutableList<UsedVacation>
 
+    fun findAllByEmployeeIdEquals(employeeId: Long):MutableList<UsedVacation>
+
 
 
 

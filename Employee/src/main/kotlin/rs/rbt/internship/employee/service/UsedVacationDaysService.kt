@@ -22,13 +22,16 @@ class UsedVacationDaysService {
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
         if (!dateStart.equals(dateEnd)) {
             dates = dateStart.datesUntil(dateEnd.plusDays(1)).collect(Collectors.toList())
-            println(dates)
+           // println(dates)
             daysWithOutWeekend.set(dateStart.year.toString(), dates.count())
         } else {
             dates.add(dateStart)
+           // println(dates)
             daysWithOutWeekend.set(dateStart.year.toString(), dates.count())
         }
+        println(dates)
         daysWithOutWeekend = checkDaysWithoutWeekend(daysWithOutWeekend, dates)
+        // println(daysWithOutWeekend)
         return daysWithOutWeekend
     }
 
@@ -39,8 +42,10 @@ class UsedVacationDaysService {
         dates.forEach {
             if (it.dayOfWeek.toString() == "SATURDAY" || it.dayOfWeek.toString() == "SUNDAY") {
                 var days: Int = daysPerYear.get(it.year.toString())!!
+                println(days);
                 daysPerYear.replace(it.year.toString(), --days)
             }
+           // println(daysPerYear)
         }
         return daysPerYear
     }
@@ -62,6 +67,7 @@ class UsedVacationDaysService {
         daysWithOutWeekend.set(dateEnd.year.toString(), datesNextYear.count())
 
         daysWithOutWeekend = checkDaysWithoutWeekend(daysWithOutWeekend, mergedDates)
+        println(mergedDates)
 
         return daysWithOutWeekend
 

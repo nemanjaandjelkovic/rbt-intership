@@ -22,11 +22,12 @@ class UsedVacationDaysService {
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
         if (!dateStart.equals(dateEnd)) {
             dates = dateStart.datesUntil(dateEnd.plusDays(1)).collect(Collectors.toList())
-            println(dates)
+           // println(dates)
             daysWithOutWeekend.set(dateStart.year.toString(), dates.count())
         } else {
             dates.add(dateStart)
             daysWithOutWeekend.set(dateStart.year.toString(), dates.count())
+            //println(daysWithOutWeekend)
         }
         daysWithOutWeekend = checkDaysWithoutWeekend(daysWithOutWeekend, dates)
         return daysWithOutWeekend

@@ -30,4 +30,8 @@ class UsedVacationService() {
     {
         return usedVacationRepository.findAllByDateStartGreaterThanEqualAndDateEndLessThanEqual(dateStart,dateEnd)
     }
+    fun datesPerEmployee(employeeId: Long):MutableList<UsedVacation>
+    {
+        return usedVacationRepository.findAllByEmployeeIdEquals(employeeId)
+    }
 }

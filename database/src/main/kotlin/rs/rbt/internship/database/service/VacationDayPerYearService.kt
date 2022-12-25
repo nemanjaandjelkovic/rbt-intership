@@ -3,6 +3,7 @@ package rs.rbt.internship.database.service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import rs.rbt.internship.database.model.Employee
+import rs.rbt.internship.database.model.UsedVacation
 import rs.rbt.internship.database.model.VacationDayPerYear
 import rs.rbt.internship.database.repository.VacationDayPerYearRepository
 
@@ -22,5 +23,10 @@ class VacationDayPerYearService {
     fun findByYearAndEmployeeId(year:String,employee:Employee):VacationDayPerYear
     {
         return vacationDayPerYearRepository.findByYearEqualsAndEmployeeIdEquals(year,employee.id)
+    }
+
+    fun findAllByEmployeeId(employeeId: Long):MutableList<VacationDayPerYear>
+    {
+        return vacationDayPerYearRepository.findAllByEmployeeIdEquals(employeeId)
     }
 }

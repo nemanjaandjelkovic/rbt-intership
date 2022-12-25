@@ -33,4 +33,10 @@ class EmployeeController {
         employeeBusinessService.addVacation(dateStart,dateEnd,employeeEmail)
     }
 
+    @GetMapping("")
+    fun employeeInfo( @RequestParam(name = "employeeEmail") employeeEmail: String):MutableMap<String,MutableList<Int>>
+    {
+      return employeeBusinessService.employeeInfo(employeeEmail)
+    }
+
 }

@@ -13,7 +13,7 @@ interface VacationDayPerYearRepository : JpaRepository<VacationDayPerYear, Long>
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(
-        "UPDATE vacation_day_per_year SET days= :days WHERE employee_id= :employee_id AND year= :year",
+        "UPDATE vacation_day_per_year SET days= days-:days WHERE employee_id= :employee_id AND year= :year",
         nativeQuery = true
     )
     fun updateVacationDayPerYear(
@@ -23,5 +23,7 @@ interface VacationDayPerYearRepository : JpaRepository<VacationDayPerYear, Long>
     )
 
     fun findByYearEqualsAndEmployeeIdEquals(year:String, employeeId:Long):VacationDayPerYear
+
+    fun findAllByEmployeeIdEquals(employeeId:Long):MutableList<VacationDayPerYear>
 
 }

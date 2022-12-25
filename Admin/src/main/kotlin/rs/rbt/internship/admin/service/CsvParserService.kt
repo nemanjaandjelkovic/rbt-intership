@@ -72,6 +72,7 @@ class CsvParserService {
                 employee = employeeServices.findEmployeeByEmail(it.get(0))
             )
             day = usedVacationDaysService.getDaysBetweenDate(usedVacation.dateStart, usedVacation.dateEnd)
+            println("test $day")
             usedVacationMutableList.add(usedVacation)
             day.forEach {
                 usedVacationDayPerYearService.updateVacationDayPerYears(it.value, it.key, usedVacation.employee)

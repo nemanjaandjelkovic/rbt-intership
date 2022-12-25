@@ -97,4 +97,46 @@ class EmployeeBusinessService {
             }
         }
     }
+
+    fun employeeInfo(employeeEmail: String):MutableMap<String,MutableList<Int>> {
+        val emailValidated: Boolean = EmailValidator.getInstance().isValid(employeeEmail)
+        val employee: Employee = employeeService.findEmployeeByEmail(employeeEmail)
+
+        var usedVacationEmployee: MutableList<UsedVacation> = mutableListOf()
+
+        //used days per year
+        var daysPerYear: MutableMap<String, Int> = mutableMapOf()
+
+        var daysPerYearUsedVacation: MutableMap<String, Int> = mutableMapOf()
+
+        if (emailValidated && employee != null) {
+            usedVacationEmployee = usedVacationService.datesPerEmployee(employee.id)
+            usedVacationEmployee.forEach {
+                daysPerYearUsedVacation = usedVacationDaysService.getDaysBetweenDate(it.dateStart, it.dateEnd)
+                daysPerYearUsedVacation.forEach { t, u ->
+                    if (daysPerYear.containsKey(t))
+                    {
+                        daysPerYear.set(key=t,daysPerYear.getValue(key = t)+daysPerYearUsedVacation.getValue(key=t))
+                    }
+                    else{
+                        daysPerYear.set(key=t, value = daysPerYearUsedVacation.getValue(key=t))
+                    }
+                }
+            }
+        }
+        var daysPerYearWithListDays:MutableMap<String,MutableList<Int>> = mutableMapOf()
+
+        daysPerYear.forEach { t, u ->
+            var daysLeft:Int = vacationDayPerYearService.findByYearAndEmployeeId(t,employee).day
+            var daysTotalLeftUsed:MutableList<Int> = mutableListOf()
+            daysTotalLeftUsed.add(u+daysLeft)
+            daysTotalLeftUsed.add(daysLeft)
+            daysTotalLeftUsed.add(u)
+            daysPerYearWithListDays.set(key = t, value = daysTotalLeftUsed)
+        }
+
+        println()
+        return daysPerYearWithListDays
+    }
+
 }
