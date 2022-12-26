@@ -21,12 +21,12 @@ class AdminService {
     @Autowired
     lateinit var vacationDayPerYearService: VacationDayPerYearService
 
-    fun UploadEmployees(file:MultipartFile){
+    fun uploadEmployees(file:MultipartFile){
         val employeeMutableList: MutableList<Employee> = csvParserService.uploadCsvEmployee(file)
         employeeService.saveEmployees(employeeMutableList)
     }
 
-    fun UploadUsedVacations(file:MultipartFile){
+    fun uploadUsedVacations(file:MultipartFile){
         val usedVacationMutableList: MutableList<UsedVacation> = csvParserService.uploadCsvUsedVacation(file)
         usedVacationService.saveUsedVacations(usedVacationMutableList)
     }

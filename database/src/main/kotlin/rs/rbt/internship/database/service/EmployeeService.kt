@@ -18,4 +18,9 @@ class EmployeeService(var employeeRepository: EmployeeRepository) {
         employeeRepository.save(employee)
     }
 
+    fun employeeExists(employeeEmail: String):Boolean
+    {
+        return employeeRepository.existsEmployeeByEmail(employeeEmail)
+    }
+
 }

@@ -9,10 +9,10 @@ class UsedVacationDaysService {
     fun getDaysBetweenDate(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
         var days: Int = 0
-        if (dateStart.year == dateEnd.year) {
-            daysWithOutWeekend = getDaysBetweenDateSameYear(dateStart, dateEnd)
+        daysWithOutWeekend = if (dateStart.year == dateEnd.year) {
+            getDaysBetweenDateSameYear(dateStart, dateEnd)
         } else {
-            daysWithOutWeekend = getDaysBetweenDateDifferentYear(dateStart, dateEnd)
+            getDaysBetweenDateDifferentYear(dateStart, dateEnd)
         }
         return daysWithOutWeekend
     }

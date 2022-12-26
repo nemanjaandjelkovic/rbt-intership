@@ -26,12 +26,14 @@ class UsedVacationService() {
     {
         return usedVacationRepository.findAllByDateStartGreaterThanEqualAndDateEndLessThanEqualAndEmployeeIdEquals(dateStart,dateEnd,employeeId)
     }
-    fun dates2(dateStart:LocalDate,dateEnd:LocalDate,employee:Employee):MutableList<UsedVacation>
-    {
-        return usedVacationRepository.findAllByDateStartGreaterThanEqualAndDateEndLessThanEqual(dateStart,dateEnd)
-    }
+
     fun datesPerEmployee(employeeId: Long):MutableList<UsedVacation>
     {
         return usedVacationRepository.findAllByEmployeeIdEquals(employeeId)
+    }
+
+    fun existsUsedVacation(dateStart:LocalDate,dateEnd:LocalDate,employeeEmail:String):Boolean
+    {
+        return usedVacationRepository.existsByDateStartAndDateEndAndEmployeeEmail(dateStart,dateEnd,employeeEmail)
     }
 }

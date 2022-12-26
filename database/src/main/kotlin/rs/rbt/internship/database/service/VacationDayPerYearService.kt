@@ -29,4 +29,9 @@ class VacationDayPerYearService {
     {
         return vacationDayPerYearRepository.findAllByEmployeeIdEquals(employeeId)
     }
+
+    fun existsVacationDayPerYear(year:String, employeeId:Long):Boolean
+    {
+        return vacationDayPerYearRepository.existsByYearAndEmployeeId(year, employeeId)
+    }
 }

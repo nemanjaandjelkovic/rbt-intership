@@ -8,16 +8,12 @@ import java.time.LocalDate
 
 @Repository
 interface UsedVacationRepository:JpaRepository<UsedVacation,Long> {
-    override fun <S : UsedVacation?> saveAll(entities: MutableIterable<S>): MutableList<S> {
-        TODO("Not yet implemented")
-    }
-
     fun findAllByDateStartGreaterThanEqualAndDateEndLessThanEqualAndEmployeeIdEquals(dateStart: LocalDate, dateEnd:LocalDate,employeeId:Long):MutableList<UsedVacation>
 
-    fun findAllByDateStartGreaterThanEqualAndDateEndLessThanEqual(dateStart: LocalDate, dateEnd:LocalDate):MutableList<UsedVacation>
 
     fun findAllByEmployeeIdEquals(employeeId: Long):MutableList<UsedVacation>
 
+    fun existsByDateStartAndDateEndAndEmployeeEmail(dateStart: LocalDate, dateEnd:LocalDate,employeeEmail:String):Boolean
 
 
 

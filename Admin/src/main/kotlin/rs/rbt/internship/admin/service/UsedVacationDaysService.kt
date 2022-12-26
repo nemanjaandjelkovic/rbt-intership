@@ -8,11 +8,10 @@ import java.util.stream.Collectors
 class UsedVacationDaysService {
     fun getDaysBetweenDate(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
-        var days: Int = 0
-        if (dateStart.year == dateEnd.year) {
-            daysWithOutWeekend = getDaysBetweenDateSameYear(dateStart, dateEnd)
+        daysWithOutWeekend = if (dateStart.year == dateEnd.year) {
+            getDaysBetweenDateSameYear(dateStart, dateEnd)
         } else {
-            daysWithOutWeekend = getDaysBetweenDateDifferentYear(dateStart, dateEnd)
+            getDaysBetweenDateDifferentYear(dateStart, dateEnd)
         }
         return daysWithOutWeekend
     }
@@ -20,14 +19,12 @@ class UsedVacationDaysService {
     fun getDaysBetweenDateSameYear(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
         var dates: MutableList<LocalDate> = mutableListOf()
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
-        if (!dateStart.equals(dateEnd)) {
+        if (dateStart != dateEnd) {
             dates = dateStart.datesUntil(dateEnd.plusDays(1)).collect(Collectors.toList())
-           // println(dates)
-            daysWithOutWeekend.set(dateStart.year.toString(), dates.count())
+            daysWithOutWeekend[dateStart.year.toString()] = dates.count()
         } else {
             dates.add(dateStart)
-            daysWithOutWeekend.set(dateStart.year.toString(), dates.count())
-            //println(daysWithOutWeekend)
+            daysWithOutWeekend[dateStart.year.toString()] = dates.count()
         }
         daysWithOutWeekend = checkDaysWithoutWeekend(daysWithOutWeekend, dates)
         return daysWithOutWeekend
@@ -39,7 +36,7 @@ class UsedVacationDaysService {
     ): MutableMap<String, Int> {
         dates.forEach {
             if (it.dayOfWeek.toString() == "SATURDAY" || it.dayOfWeek.toString() == "SUNDAY") {
-                var days: Int = daysPerYear.get(it.year.toString())!!
+                var days: Int = daysPerYear[it.year.toString()]!!
                 daysPerYear.replace(it.year.toString(), --days)
             }
         }
@@ -51,20 +48,21 @@ class UsedVacationDaysService {
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()
 
         //Generisanje lista datuma
-        val datesLastYear: MutableList<LocalDate> = dateStart.datesUntil(middleYear).collect(Collectors.toList())
-        val datesNextYear: MutableList<LocalDate> = middleYear.datesUntil(dateEnd.plusDays(1)).collect(Collectors.toList())
+        val datesLastYear: MutableList<LocalDate> =
+            dateStart.datesUntil(middleYear).collect(Collectors.toList())
+        val datesNextYear: MutableList<LocalDate> =
+            middleYear.datesUntil(dateEnd.plusDays(1)).collect(Collectors.toList())
 
         //Spajanje u jednu listu
         val mergedDates: MutableList<LocalDate> = mutableListOf()
         mergedDates.addAll(datesLastYear)
         mergedDates.addAll(datesNextYear)
 
-        daysWithOutWeekend.set(dateStart.year.toString(), datesLastYear.count())
-        daysWithOutWeekend.set(dateEnd.year.toString(), datesNextYear.count())
+        daysWithOutWeekend[dateStart.year.toString()] = datesLastYear.count()
+        daysWithOutWeekend[dateEnd.year.toString()] = datesNextYear.count()
 
         daysWithOutWeekend = checkDaysWithoutWeekend(daysWithOutWeekend, mergedDates)
 
         return daysWithOutWeekend
-
     }
 }

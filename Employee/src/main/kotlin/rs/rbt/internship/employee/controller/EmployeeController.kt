@@ -26,17 +26,19 @@ class EmployeeController {
 
     @PostMapping("/addVacation")
     fun addVacation(
-        @RequestParam dateStart: String,
-        @RequestParam dateEnd: String,
-        @RequestParam(name = "employeeEmail") employeeEmail: String
+        @RequestParam
+        dateStart: String,
+        @RequestParam
+        dateEnd: String,
+        @RequestParam(name = "employeeEmail")
+        employeeEmail: String
     ) {
-        employeeBusinessService.addVacation(dateStart,dateEnd,employeeEmail)
+        employeeBusinessService.addVacation(dateStart, dateEnd, employeeEmail)
     }
 
     @GetMapping("")
-    fun employeeInfo( @RequestParam(name = "employeeEmail") employeeEmail: String):MutableMap<String,MutableList<Int>>
-    {
-      return employeeBusinessService.employeeInfo(employeeEmail)
+    fun employeeInfo(@RequestParam(name = "employeeEmail") employeeEmail: String): MutableMap<String, MutableList<Int>> {
+        return employeeBusinessService.employeeInfo(employeeEmail)
     }
 
 }

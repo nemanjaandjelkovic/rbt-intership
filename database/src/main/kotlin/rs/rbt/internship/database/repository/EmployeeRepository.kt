@@ -9,6 +9,7 @@ import rs.rbt.internship.database.model.Employee
 interface EmployeeRepository:JpaRepository<Employee,Long> {
     fun findEmployeeByEmail(email:String):Employee
 
+    fun existsEmployeeByEmail(email:String):Boolean
 
 
 

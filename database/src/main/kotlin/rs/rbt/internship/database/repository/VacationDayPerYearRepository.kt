@@ -26,4 +26,5 @@ interface VacationDayPerYearRepository : JpaRepository<VacationDayPerYear, Long>
 
     fun findAllByEmployeeIdEquals(employeeId:Long):MutableList<VacationDayPerYear>
 
+    fun existsByYearAndEmployeeId(year:String, employeeId:Long):Boolean
 }
