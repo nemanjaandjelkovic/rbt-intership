@@ -22,16 +22,16 @@ class AdminService {
     lateinit var vacationDayPerYearService: VacationDayPerYearService
 
     fun uploadEmployees(file:MultipartFile){
-        val employeeMutableList: MutableList<Employee> = csvParserService.uploadCsvEmployee(file)
-        employeeService.saveEmployees(employeeMutableList)
+        val employees: MutableList<Employee> = csvParserService.csvParseEmployee(file)
+        employeeService.saveEmployees(employees)
     }
 
     fun uploadUsedVacations(file:MultipartFile){
-        val usedVacationMutableList: MutableList<UsedVacation> = csvParserService.uploadCsvUsedVacation(file)
-        usedVacationService.saveUsedVacations(usedVacationMutableList)
+        val usedVacations: MutableList<UsedVacation> = csvParserService.csvParseUsedVacation(file)
+        usedVacationService.saveUsedVacations(usedVacations)
     }
     fun uploadVacationDaysPerYear(file: MutableList<MultipartFile>) {
-        val vacationDayPerYears:MutableList<VacationDayPerYear> = csvParserService.uploadCsvVacationDayPerYears(file)
+        val vacationDayPerYears:MutableList<VacationDayPerYear> = csvParserService.csvParseVacationDayPerYears(file)
         vacationDayPerYearService.saveVacationDayPerYears(vacationDayPerYears)
     }
 

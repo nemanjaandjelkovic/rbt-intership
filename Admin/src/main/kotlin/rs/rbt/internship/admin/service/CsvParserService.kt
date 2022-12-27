@@ -22,25 +22,34 @@ import java.time.format.DateTimeFormatter
 
 @Service
 class CsvParserService {
-    //PROVERA CSV PODATKA PRE RADA!!!!!
     @Autowired
     lateinit var employeeServices: EmployeeService
 
     @Autowired
     lateinit var usedVacationDayPerYearService: VacationDayPerYearService
 
-    @Autowired
-    lateinit var usedVacationDaysService: UsedVacationDaysService
+    var usedVacationDaysService: UsedVacationDaysService = UsedVacationDaysService()
 
     @Autowired
     lateinit var parametersCheckService: ParametersCheckService
 
     @Autowired
     lateinit var usedVacationService: UsedVacationService
-    fun uploadCsvEmployee(file: MultipartFile): MutableList<Employee> {
 
-        val fileReader: BufferedReader = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
-        val csvParser: CSVParser = CSVParser(
+
+    //TODO:
+    // PROVERA NAZIVA HEADERA ISTO TREBA!!!
+    // VRACA JSON OBJEKTE KOJI NISU PROSLI
+    // TREBA DA BUDU STANDARDIZOVANE PORUKE
+    // PROVERITI BR KOLONA U CSV
+    // STATUSE PROVERITI DA LI VRACAJU TACNO
+    // DATUM DA NIje end veci od starta proveriti
+    // HTTP response vratiti bolje
+
+    fun csvParseEmployee(file: MultipartFile): MutableList<Employee> {
+
+        val fileReader = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
+        val csvParser = CSVParser(
             fileReader, CSVFormat.DEFAULT
                 .withFirstRecordAsHeader()
                 .withIgnoreHeaderCase()
@@ -48,7 +57,7 @@ class CsvParserService {
                 .withTrim()
         )
 
-        val employeeMutableList: MutableList<Employee> = mutableListOf()
+        val employees: MutableList<Employee> = mutableListOf()
         val csvRecords: Iterable<CSVRecord> = csvParser.records
         csvRecords.forEach {
             if (it.recordNumber != 1L) {
@@ -58,10 +67,11 @@ class CsvParserService {
                             email = it.get(0),
                             password = it.get(1)
                         )
-                        employeeMutableList.add(employee)
+                        employees.add(employee)
                     } else {
                         throw ResponseStatusException(
-                            HttpStatus.NOT_ACCEPTABLE, "Employee vec postoji, ostali koji ne postoje su uneti"
+                            HttpStatus.NOT_ACCEPTABLE,
+                            "Employee vec postoji, ostali koji ne postoje su uneti"
                         )
                     }
                 } else {
@@ -72,24 +82,23 @@ class CsvParserService {
 
             }
         }
-        return employeeMutableList
+        return employees
     }
 
-    fun uploadCsvUsedVacation(file: MultipartFile): MutableList<UsedVacation> {
+    fun csvParseUsedVacation(file: MultipartFile): MutableList<UsedVacation> {
 
-        val fileRead: BufferedReader = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
-        val csvParser: CSVParser = CSVParser(
+        val fileRead = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
+        val csvParser = CSVParser(
             fileRead, CSVFormat.DEFAULT
                 .withFirstRecordAsHeader()
                 .withIgnoreHeaderCase()
                 .withTrim()
         )
-        val usedVacationMutableList: MutableList<UsedVacation> = mutableListOf()
+        val usedVacations: MutableList<UsedVacation> = mutableListOf()
         val csvRecords: Iterable<CSVRecord> = csvParser.records
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
-        var day: MutableMap<String, Int> = mutableMapOf()
+        var day: MutableMap<String, Int>
         csvRecords.forEach { it ->
-            // try {
             // if employee exists
             if (employeeServices.employeeExists(it.get(0)) && parametersCheckService.checkEmail(it.get(0))) {
                 val usedVacation = UsedVacation(
@@ -105,14 +114,14 @@ class CsvParserService {
                     )
                 ) {
                     day = usedVacationDaysService.getDaysBetweenDate(usedVacation.dateStart, usedVacation.dateEnd)
-                    var yearDayLeft = VacationDayPerYear()
+                    var yearDayLeft: VacationDayPerYear
 
                     day.forEach {
                         try {
                             yearDayLeft =
                                 usedVacationDayPerYearService.findByYearAndEmployeeId(it.key, usedVacation.employee)
                             if (yearDayLeft.day - it.value >= 0 && it.key == yearDayLeft.year) {
-                                usedVacationMutableList.add(usedVacation)
+                                usedVacations.add(usedVacation)
                                 usedVacationDayPerYearService.updateVacationDayPerYears(
                                     it.value,
                                     it.key,
@@ -135,13 +144,13 @@ class CsvParserService {
             }
         }
 
-        return usedVacationMutableList
+        return usedVacations
 
     }
 
 
-    fun uploadCsvVacationDayPerYears(file: MutableList<MultipartFile>): MutableList<VacationDayPerYear> {
-        val vacationDayPerYearList: MutableList<VacationDayPerYear> = mutableListOf()
+    fun csvParseVacationDayPerYears(file: MutableList<MultipartFile>): MutableList<VacationDayPerYear> {
+        val vacationDayPerYears: MutableList<VacationDayPerYear> = mutableListOf()
         file.forEach { it ->
             val fileRead = BufferedReader(InputStreamReader(it.inputStream, "UTF-8"))
             val csvParser = CSVParser(
@@ -153,7 +162,7 @@ class CsvParserService {
             csvRecords.forEach {
                 if (it.recordNumber != 1L) {
                     //if employee exists and year have 4 char
-                    if (employeeServices.employeeExists(it.get(0)) && parametersCheckService.checkEmail(it.get(0)) && headers[1].length==4) {
+                    if (employeeServices.employeeExists(it.get(0)) && parametersCheckService.checkEmail(it.get(0)) && headers[1].length == 4) {
                         val vacationDayPerYear: VacationDayPerYear = VacationDayPerYear(
                             year = headers[1],
                             day = Integer.parseInt(it.get(1)),
@@ -165,7 +174,7 @@ class CsvParserService {
                                 vacationDayPerYear.employee.id
                             )
                         ) {
-                            vacationDayPerYearList.add(vacationDayPerYear)
+                            vacationDayPerYears.add(vacationDayPerYear)
                             employeeServices.saveEmployee(employee)
                         } else {
                             throw ResponseStatusException(
@@ -180,7 +189,7 @@ class CsvParserService {
                 }
             }
         }
-        return vacationDayPerYearList
+        return vacationDayPerYears
     }
 
 

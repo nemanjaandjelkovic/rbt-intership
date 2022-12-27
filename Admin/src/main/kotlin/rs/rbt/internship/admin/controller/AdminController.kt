@@ -22,7 +22,7 @@ class AdminController(){
 
     @PostMapping("/upload/used-vacation")
     fun uploadUsedVacation(@RequestParam("file") file: MultipartFile) {
-        adminService.uploadUsedVacations(file)
+         adminService.uploadUsedVacations(file)
     }
 
     @PostMapping("/upload/vacations")

@@ -23,8 +23,7 @@ class EmployeeBusinessService {
     @Autowired
     lateinit var usedVacationService: UsedVacationService
 
-    @Autowired
-    lateinit var usedVacationDaysService: UsedVacationDaysService
+    var usedVacationDaysService: UsedVacationDaysService = UsedVacationDaysService()
 
     @Autowired
     lateinit var vacationDayPerYearService: VacationDayPerYearService

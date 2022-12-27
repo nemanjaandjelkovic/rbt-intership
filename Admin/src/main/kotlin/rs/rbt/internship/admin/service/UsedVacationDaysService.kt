@@ -1,10 +1,9 @@
 package rs.rbt.internship.admin.service
 
-import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.stream.Collectors
 
-@Service
+
 class UsedVacationDaysService {
     fun getDaysBetweenDate(dateStart: LocalDate, dateEnd: LocalDate): MutableMap<String, Int> {
         var daysWithOutWeekend: MutableMap<String, Int> = mutableMapOf()

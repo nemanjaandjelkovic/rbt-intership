@@ -12,12 +12,6 @@ class ParametersCheckService {
     @Autowired
     lateinit var employeeService: EmployeeService
 
-    fun checkEmployee(emailEmployee: String):Boolean {
-
-            val employee:Employee = employeeService.findEmployeeByEmail(emailEmployee)
-            return ObjectUtils.isEmpty(employee)
-    }
-
     fun checkEmail(emailEmployee: String):Boolean {
        return EmailValidator.getInstance().isValid(emailEmployee)
     }
