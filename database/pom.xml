@@ -8,9 +8,9 @@
     <name>database</name>
     <description>database</description>
     <properties>
-<!--        Obrisati depedency koji mi nisu potrebni, i prebaciti bisnis logiku na glavne projekte,
-            Ovde ostaje samo rad sa repository, model, repo i servici koji sadrze metode za repo
--->
+        <!--        Obrisati depedency koji mi nisu potrebni, i prebaciti bisnis logiku na glavne projekte,
+                    Ovde ostaje samo rad sa repository, model, repo i servici koji sadrze metode za repo
+        -->
         <java.version>17</java.version>
         <kotlin.version>1.7.21</kotlin.version>
         <spring.version>3.0.0</spring.version>
@@ -26,10 +26,11 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>${spring.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-security</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -63,11 +64,11 @@
             <scope>test</scope>
             <version>${spring.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.security</groupId>-->
-<!--            <artifactId>spring-security-test</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.security</groupId>-->
+        <!--            <artifactId>spring-security-test</artifactId>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>

@@ -61,10 +61,7 @@ class EmployeeBusinessService {
         }
     }
 
-    fun convertParameters(
-        dateStart: String,
-        dateEnd: String
-    ): MutableList<LocalDate> {
+    fun convertParameters(dateStart: String, dateEnd: String): MutableList<LocalDate> {
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
         val dates: MutableList<LocalDate> = mutableListOf()
         dates.add(LocalDate.parse(dateStart, formatter))
@@ -74,11 +71,7 @@ class EmployeeBusinessService {
     }
 
 
-    fun addVacation(
-        dateStart: String,
-        dateEnd: String,
-        employeeEmail: String
-    ) {
+    fun addVacation(dateStart: String, dateEnd: String, employeeEmail: String) {
         if (parametersValid(dateStart, dateEnd, employeeEmail)) {
             val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
             val yearsDay: MutableMap<String, Int> =
@@ -96,8 +89,7 @@ class EmployeeBusinessService {
 
                 }
             }
-        }
-        else{
+        } else {
             throw ResponseStatusException(
                 HttpStatus.NOT_ACCEPTABLE, "Nemate dovoljno slobodnih dana odmora"
             )

@@ -17,4 +17,6 @@ interface UsedVacationRepository:JpaRepository<UsedVacation,Long> {
 
 
 
+
+
 }

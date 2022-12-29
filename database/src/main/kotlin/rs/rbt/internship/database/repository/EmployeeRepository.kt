@@ -11,6 +11,8 @@ interface EmployeeRepository:JpaRepository<Employee,Long> {
 
     fun existsEmployeeByEmail(email:String):Boolean
 
+    fun existsEmployeeByEmailAndPassword(email:String,password:String):Boolean
+
 
 
 

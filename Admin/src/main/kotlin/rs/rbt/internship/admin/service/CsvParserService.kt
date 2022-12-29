@@ -38,10 +38,8 @@ class CsvParserService {
 
 
     //TODO:
-    // PROVERA NAZIVA HEADERA ISTO TREBA!!!
     // VRACA JSON OBJEKTE KOJI NISU PROSLI
     // TREBA DA BUDU STANDARDIZOVANE PORUKE
-    // PROVERITI BR KOLONA U CSV
     // STATUSE PROVERITI DA LI VRACAJU TACNO
     // DATUM DA NIje end veci od starta proveriti
     // HTTP response vratiti bolje
@@ -56,9 +54,12 @@ class CsvParserService {
                 .withIgnoreEmptyLines()
                 .withTrim()
         )
+        val headers: List<String> = csvParser.headerNames
 
         val employees: MutableList<Employee> = mutableListOf()
         val csvRecords: Iterable<CSVRecord> = csvParser.records
+
+
         csvRecords.forEach {
             if (it.recordNumber != 1L) {
                 if (parametersCheckService.checkEmail(it.get(0))) {
@@ -80,6 +81,13 @@ class CsvParserService {
                     )
                 }
 
+            } else {
+                if (it.get(0) != "Employee Email" && it.get(1) != "Employee Password") {
+                    println(headers[0])
+                    return throw ResponseStatusException(
+                        HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+                    )
+                }
             }
         }
         return employees
@@ -98,7 +106,23 @@ class CsvParserService {
         val csvRecords: Iterable<CSVRecord> = csvParser.records
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
         var day: MutableMap<String, Int>
+        if (csvParser.headerNames.size != 3) {
+            return throw ResponseStatusException(
+                HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+            )
+        }
+        if (csvParser.headerNames[0] != "Employee" && csvParser.headerNames[1] != "Vacation start date" && csvParser.headerNames[2] != "Vacation end date") {
+            return throw ResponseStatusException(
+                HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+            )
+        }
+        println("${csvParser.headerNames[0]} test")
         csvRecords.forEach { it ->
+            if (LocalDate.parse(it.get(1), formatter) > LocalDate.parse(it.get(2), formatter)) {
+                return throw ResponseStatusException(
+                    HttpStatus.NOT_ACCEPTABLE, "DATE 2 IS BIGGER THAN DATE 1"
+                )
+            }
             // if employee exists
             if (employeeServices.employeeExists(it.get(0)) && parametersCheckService.checkEmail(it.get(0))) {
                 val usedVacation = UsedVacation(
@@ -184,6 +208,13 @@ class CsvParserService {
                     } else {
                         throw ResponseStatusException(
                             HttpStatus.NOT_ACCEPTABLE, "Ne postoji taj employee"
+                        )
+                    }
+                } else {
+                    if (it.get(0) != "Employee" && it.get(1) != "Total vacation days") {
+                        println(headers[0])
+                        return throw ResponseStatusException(
+                            HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
                         )
                     }
                 }

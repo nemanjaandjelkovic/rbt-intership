@@ -23,4 +23,10 @@ class EmployeeService(var employeeRepository: EmployeeRepository) {
         return employeeRepository.existsEmployeeByEmail(employeeEmail)
     }
 
+    fun employeeEx(employeeEmail:String,employeePassword:String):Boolean
+    {
+        return employeeRepository.existsEmployeeByEmailAndPassword(employeeEmail,employeePassword)
+
+    }
+
 }
