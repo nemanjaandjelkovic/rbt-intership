@@ -36,4 +36,9 @@ class UsedVacationService() {
     {
         return usedVacationRepository.existsByDateStartAndDateEndAndEmployeeEmail(dateStart,dateEnd,employeeEmail)
     }
+
+    fun deleteAllUsedVacation()
+    {
+        usedVacationRepository.deleteAll()
+    }
 }

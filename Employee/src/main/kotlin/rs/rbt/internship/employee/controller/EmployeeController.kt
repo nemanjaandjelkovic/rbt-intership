@@ -39,9 +39,9 @@ class EmployeeController {
     }
 
     @GetMapping("")
-    fun employeeInfo(): MutableMap<String, MutableList<Int>> {
+    fun employeeInfo(year:String): MutableMap<String, MutableList<Int>> {
         val auth: Authentication = SecurityContextHolder.getContext().authentication
-        return employeeBusinessService.employeeInfo(auth.name)
+        return employeeBusinessService.employeeInfo(auth.name,year)
     }
 
 }

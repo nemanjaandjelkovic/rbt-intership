@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import rs.rbt.internship.admin.service.AdminService
@@ -21,6 +22,7 @@ class AdminController(){
     }
 
     @PostMapping("/upload/used-vacation")
+    @ResponseBody
     fun uploadUsedVacation(@RequestParam("file") file: MultipartFile) {
          adminService.uploadUsedVacations(file)
     }
@@ -28,6 +30,11 @@ class AdminController(){
     @PostMapping("/upload/vacations")
     fun uploadVacationDaysPerYear(@RequestParam("file") file: MutableList<MultipartFile>) {
        adminService.uploadVacationDaysPerYear(file)
+    }
+
+    @PostMapping("/deleteall")
+    fun deleteAll() {
+        adminService.deleteAll()
     }
 
 }

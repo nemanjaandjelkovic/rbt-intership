@@ -28,6 +28,8 @@ class EmployeeBusinessService {
     @Autowired
     lateinit var vacationDayPerYearService: VacationDayPerYearService
 
+
+
     fun showListRecordsOfUsedVacation(
         dateStart: String,
         dateEnd: String,
@@ -38,8 +40,16 @@ class EmployeeBusinessService {
         val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
 
         if (parametersValid(dateStart, dateEnd, employeeEmail)) {
-            val employee = employeeService.findEmployeeByEmail(employeeEmail)
-            usedVacations = usedVacationService.dates(dateStartEnd[0], dateStartEnd[1], employee.id)
+            if (dateStart<dateEnd)
+            {
+                val employee = employeeService.findEmployeeByEmail(employeeEmail)
+                usedVacations = usedVacationService.dates(dateStartEnd[0], dateStartEnd[1], employee.id)
+            }
+            else{
+                throw ResponseStatusException(
+                    HttpStatus.NOT_ACCEPTABLE, "Pogresno unesen vremenski period krajnji datum je manji od pocetnog"
+                )
+            }
         } else {
 
         }
@@ -73,22 +83,31 @@ class EmployeeBusinessService {
 
     fun addVacation(dateStart: String, dateEnd: String, employeeEmail: String) {
         if (parametersValid(dateStart, dateEnd, employeeEmail)) {
-            val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
-            val yearsDay: MutableMap<String, Int> =
-                usedVacationDaysService.getDaysBetweenDate(dateStartEnd[0], dateStartEnd[1])
-            val employee: Employee = employeeService.findEmployeeByEmail(employeeEmail)
-            lateinit var vacationDayPerYear: VacationDayPerYear
-            var newDay: Int = 0
-            yearsDay.forEach { (k, v) ->
-                vacationDayPerYear = vacationDayPerYearService.findByYearAndEmployeeId(k, employee)
-                newDay = vacationDayPerYear.day - v
-                if (newDay >= 0) {
-                    vacationDayPerYearService.updateVacationDayPerYears(newDay, k, employee)
-                    usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
-                } else {
+            if (dateStart<dateEnd)
+            {
+                val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
+                val yearsDay: MutableMap<String, Int> =
+                    usedVacationDaysService.getDaysBetweenDate(dateStartEnd[0], dateStartEnd[1])
+                val employee: Employee = employeeService.findEmployeeByEmail(employeeEmail)
+                lateinit var vacationDayPerYear: VacationDayPerYear
+                var newDay: Int = 0
+                yearsDay.forEach { (k, v) ->
+                    vacationDayPerYear = vacationDayPerYearService.findByYearAndEmployeeId(k, employee)
+                    newDay = vacationDayPerYear.day - v
+                    if (newDay >= 0) {
+                        vacationDayPerYearService.updateVacationDayPerYears(newDay, k, employee)
+                        usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
+                    } else {
 
+                    }
                 }
             }
+            else{
+                throw ResponseStatusException(
+                    HttpStatus.NOT_ACCEPTABLE, "Pogresno unesen vremenski period krajnji datum je manji od pocetnog"
+                )
+            }
+
         } else {
             throw ResponseStatusException(
                 HttpStatus.NOT_ACCEPTABLE, "Nemate dovoljno slobodnih dana odmora"
@@ -96,7 +115,7 @@ class EmployeeBusinessService {
         }
     }
 
-    fun employeeInfo(employeeEmail: String): MutableMap<String, MutableList<Int>> {
+    fun employeeInfo(employeeEmail: String,year:String): MutableMap<String, MutableList<Int>> {
         val emailValidated: Boolean = EmailValidator.getInstance().isValid(employeeEmail)
         val employee: Employee = employeeService.findEmployeeByEmail(employeeEmail)
 
@@ -108,30 +127,33 @@ class EmployeeBusinessService {
         var daysPerYearUsedVacation: MutableMap<String, Int> = mutableMapOf()
 
         if (emailValidated && employee != null) {
-            usedVacationEmployee = usedVacationService.datesPerEmployee(employee.id)
+                usedVacationEmployee = usedVacationService.datesPerEmployee(employee.id)
             usedVacationEmployee.forEach {
                 daysPerYearUsedVacation = usedVacationDaysService.getDaysBetweenDate(it.dateStart, it.dateEnd)
-                daysPerYearUsedVacation.forEach { (t) ->
-                    if (daysPerYear.containsKey(t)) {
-                        daysPerYear.set(
-                            key = t,
-                            daysPerYear.getValue(key = t) + daysPerYearUsedVacation.getValue(key = t)
-                        )
-                    } else {
-                        daysPerYear.set(key = t, value = daysPerYearUsedVacation.getValue(key = t))
+                    daysPerYearUsedVacation.forEach { (t) ->
+                        if (daysPerYear.containsKey(t)) {
+                            daysPerYear.set(
+                                key = t,
+                                daysPerYear.getValue(key = t) + daysPerYearUsedVacation.getValue(key = t)
+                            )
+                        } else {
+                            daysPerYear.set(key = t, value = daysPerYearUsedVacation.getValue(key = t))
+                        }
                     }
-                }
             }
+
         }
         var daysPerYearWithListDays: MutableMap<String, MutableList<Int>> = mutableMapOf()
 
         daysPerYear.forEach { (t, u) ->
-            var daysLeft: Int = vacationDayPerYearService.findByYearAndEmployeeId(t, employee).day
-            var daysTotalLeftUsed: MutableList<Int> = mutableListOf()
-            daysTotalLeftUsed.add(u + daysLeft)
-            daysTotalLeftUsed.add(daysLeft)
-            daysTotalLeftUsed.add(u)
-            daysPerYearWithListDays.set(key = t, value = daysTotalLeftUsed)
+            if (year==t) {
+                var daysLeft: Int = vacationDayPerYearService.findByYearAndEmployeeId(t, employee).day
+                var daysTotalLeftUsed: MutableList<Int> = mutableListOf()
+                daysTotalLeftUsed.add(u + daysLeft)
+                daysTotalLeftUsed.add(daysLeft)
+                daysTotalLeftUsed.add(u)
+                daysPerYearWithListDays.set(key = t, value = daysTotalLeftUsed)
+            }
         }
 
         println()

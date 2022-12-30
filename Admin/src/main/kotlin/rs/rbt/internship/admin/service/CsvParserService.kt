@@ -40,9 +40,6 @@ class CsvParserService {
     //TODO:
     // VRACA JSON OBJEKTE KOJI NISU PROSLI
     // TREBA DA BUDU STANDARDIZOVANE PORUKE
-    // STATUSE PROVERITI DA LI VRACAJU TACNO
-    // DATUM DA NIje end veci od starta proveriti
-    // HTTP response vratiti bolje
 
     fun csvParseEmployee(file: MultipartFile): MutableList<Employee> {
 
@@ -116,11 +113,10 @@ class CsvParserService {
                 HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
             )
         }
-        println("${csvParser.headerNames[0]} test")
         csvRecords.forEach { it ->
             if (LocalDate.parse(it.get(1), formatter) > LocalDate.parse(it.get(2), formatter)) {
                 return throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, "DATE 2 IS BIGGER THAN DATE 1"
+                    HttpStatus.NOT_ACCEPTABLE, "Pogresno unesen vremenski period krajnji datum je manji od pocetnog"
                 )
             }
             // if employee exists
@@ -158,7 +154,7 @@ class CsvParserService {
                     }
                 } else {
                     throw ResponseStatusException(
-                        HttpStatus.NOT_ACCEPTABLE, "Vec postoji odmor"
+                        HttpStatus.OK, "Vec postoje odmori sa tim paramatrima, ostali su uneti koji ne postoje"
                     )
                 }
             } else {

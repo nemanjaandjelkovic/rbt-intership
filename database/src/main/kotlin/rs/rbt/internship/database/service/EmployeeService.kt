@@ -29,4 +29,9 @@ class EmployeeService(var employeeRepository: EmployeeRepository) {
 
     }
 
+    fun deleteAllEmployee()
+    {
+        employeeRepository.deleteAll()
+    }
+
 }

@@ -34,4 +34,9 @@ class VacationDayPerYearService {
     {
         return vacationDayPerYearRepository.existsByYearAndEmployeeId(year, employeeId)
     }
+
+    fun deleteAllVacationDayPerYear()
+    {
+        vacationDayPerYearRepository.deleteAll()
+    }
 }

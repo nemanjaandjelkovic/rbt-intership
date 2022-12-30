@@ -14,15 +14,13 @@ class CustomAuthenticationProvider:AuthenticationProvider {
     lateinit var employeeService: EmployeeService
     override fun authenticate(authentication: Authentication?): Authentication? {
 
-            var name:String = authentication?.name.toString()
-            var password:String= authentication?.credentials.toString()
-            if(employeeService.employeeEx(name,password))
-            {
-                return UsernamePasswordAuthenticationToken(name,password, mutableListOf())
-            }
-        else{
-            return null
-            }
+        val name:String = authentication?.name.toString()
+        val password:String= authentication?.credentials.toString()
+        return if(employeeService.employeeEx(name,password)) {
+            UsernamePasswordAuthenticationToken(name,password, mutableListOf())
+        } else{
+            null
+        }
     }
 
     override fun supports(authentication: Class<*>?): Boolean {

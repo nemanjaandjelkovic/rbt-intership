@@ -14,27 +14,36 @@ import rs.rbt.internship.database.service.VacationDayPerYearService
 class AdminService {
     @Autowired
     lateinit var csvParserService: CsvParserService
+
     @Autowired
     lateinit var employeeService: EmployeeService
+
     @Autowired
     lateinit var usedVacationService: UsedVacationService
+
     @Autowired
     lateinit var vacationDayPerYearService: VacationDayPerYearService
 
-    fun uploadEmployees(file:MultipartFile){
+    fun uploadEmployees(file: MultipartFile) {
         val employees: MutableList<Employee> = csvParserService.csvParseEmployee(file)
         employeeService.saveEmployees(employees)
     }
 
-    fun uploadUsedVacations(file:MultipartFile){
+    fun uploadUsedVacations(file: MultipartFile) {
         val usedVacations: MutableList<UsedVacation> = csvParserService.csvParseUsedVacation(file)
         usedVacationService.saveUsedVacations(usedVacations)
     }
+
     fun uploadVacationDaysPerYear(file: MutableList<MultipartFile>) {
-        val vacationDayPerYears:MutableList<VacationDayPerYear> = csvParserService.csvParseVacationDayPerYears(file)
+        val vacationDayPerYears: MutableList<VacationDayPerYear> = csvParserService.csvParseVacationDayPerYears(file)
         vacationDayPerYearService.saveVacationDayPerYears(vacationDayPerYears)
     }
 
+    fun deleteAll() {
+        employeeService.deleteAllEmployee()
+        usedVacationService.deleteAllUsedVacation()
+        vacationDayPerYearService.deleteAllVacationDayPerYear()
+    }
 
 
 }
