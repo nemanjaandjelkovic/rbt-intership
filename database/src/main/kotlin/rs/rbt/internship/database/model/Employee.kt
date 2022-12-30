@@ -13,8 +13,8 @@ data class Employee(
     var email: String = "",
     @Column(name = "password")
     var password: String = "",
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee",cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
     var usedVacationList: MutableList<UsedVacation> = mutableListOf(),
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee",cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], orphanRemoval = true)
     var vacationDayPerYear: MutableList<VacationDayPerYear> = mutableListOf()
 )

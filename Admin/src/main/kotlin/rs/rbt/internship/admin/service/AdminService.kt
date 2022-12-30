@@ -40,8 +40,8 @@ class AdminService {
     }
 
     fun deleteAll() {
-        employeeService.deleteAllEmployee()
         usedVacationService.deleteAllUsedVacation()
+        employeeService.deleteAllEmployee()
         vacationDayPerYearService.deleteAllVacationDayPerYear()
     }
 

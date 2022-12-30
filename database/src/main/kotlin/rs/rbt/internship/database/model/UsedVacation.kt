@@ -15,8 +15,7 @@ class UsedVacation(
     var dateStart: LocalDate,
     @Column(name = "date_end")
     var dateEnd: LocalDate,
-    @ManyToOne
-    //@JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "employee_id")
     var employee: Employee

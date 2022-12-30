@@ -13,7 +13,7 @@ data class VacationDayPerYear(
     var year: String="",
     @Column(name = "days")
     var day: Int=0,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "employee_id")
     var employee: Employee=Employee()

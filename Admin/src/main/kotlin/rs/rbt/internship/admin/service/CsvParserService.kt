@@ -74,7 +74,7 @@ class CsvParserService {
                     }
                 } else {
                     throw ResponseStatusException(
-                        HttpStatus.NOT_ACCEPTABLE, "Postoji problem sa formatom maila, ostalo koji su dobri su uneti"
+                        HttpStatus.PARTIAL_CONTENT, "Postoji problem sa formatom maila, ostalo koji su dobri su uneti, ostali podaci koji su u redu su uneti"
                     )
                 }
 
@@ -154,12 +154,12 @@ class CsvParserService {
                     }
                 } else {
                     throw ResponseStatusException(
-                        HttpStatus.OK, "Vec postoje odmori sa tim paramatrima, ostali su uneti koji ne postoje"
+                        HttpStatus.PARTIAL_CONTENT, "Vec postoje odmori sa tim paramatrima, ostali su uneti koji ne postoje"
                     )
                 }
             } else {
                 throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, "Ne postoji taj employee"
+                    HttpStatus.NOT_FOUND, "Ne postoji taj employee"
                 )
             }
         }
@@ -198,12 +198,12 @@ class CsvParserService {
                             employeeServices.saveEmployee(employee)
                         } else {
                             throw ResponseStatusException(
-                                HttpStatus.NOT_ACCEPTABLE, "Vec postoji zapis za tu godinu"
+                                HttpStatus.BAD_REQUEST, "Vec postoji zapis za tu godinu"
                             )
                         }
                     } else {
                         throw ResponseStatusException(
-                            HttpStatus.NOT_ACCEPTABLE, "Ne postoji taj employee"
+                            HttpStatus.NOT_FOUND, "Ne postoji taj employee"
                         )
                     }
                 } else {

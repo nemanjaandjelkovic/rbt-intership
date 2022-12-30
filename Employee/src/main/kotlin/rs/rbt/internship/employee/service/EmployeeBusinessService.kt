@@ -94,11 +94,15 @@ class EmployeeBusinessService {
                 yearsDay.forEach { (k, v) ->
                     vacationDayPerYear = vacationDayPerYearService.findByYearAndEmployeeId(k, employee)
                     newDay = vacationDayPerYear.day - v
-                    if (newDay >= 0) {
+                    println("$newDay ${vacationDayPerYear.day} $v testOpet")
+                    if (newDay > 0 && vacationDayPerYear.day!=0) {
                         vacationDayPerYearService.updateVacationDayPerYears(newDay, k, employee)
+                        println("testAdd $newDay $k")
                         usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
                     } else {
-
+                        throw ResponseStatusException(
+                            HttpStatus.NOT_ACCEPTABLE, "Nemate dovoljno slobodnih dana odmora"
+                        )
                     }
                 }
             }
@@ -110,7 +114,7 @@ class EmployeeBusinessService {
 
         } else {
             throw ResponseStatusException(
-                HttpStatus.NOT_ACCEPTABLE, "Nemate dovoljno slobodnih dana odmora"
+                HttpStatus.NOT_ACCEPTABLE, "Neispravni podaci"
             )
         }
     }
