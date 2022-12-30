@@ -62,8 +62,8 @@ class EmployeeBusinessService {
         employeeEmail: String
     ): Boolean {
         val emailValidated: Boolean = EmailValidator.getInstance().isValid(employeeEmail)
-        val dateStartValidated: Boolean = DateValidator.getInstance().isValid(dateStart)
-        val dateEndValidated: Boolean = DateValidator.getInstance().isValid(dateEnd)
+        val dateStartValidated: Boolean = DateValidator.getInstance().isValid(dateStart,"d/M/yyyy")
+        val dateEndValidated: Boolean = DateValidator.getInstance().isValid(dateEnd,"d/M/yyyy")
         if (employeeService.employeeExists(employeeEmail)) {
             return emailValidated && dateEndValidated && dateStartValidated
         } else {
@@ -82,7 +82,10 @@ class EmployeeBusinessService {
 
 
     fun addVacation(dateStart: String, dateEnd: String, employeeEmail: String) {
+        println(parametersValid(dateStart, dateEnd, employeeEmail))
+        println("$dateStart $dateEnd")
         if (parametersValid(dateStart, dateEnd, employeeEmail)) {
+            println(parametersValid(dateStart, dateEnd, employeeEmail))
             if (dateStart<dateEnd)
             {
                 val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
@@ -94,13 +97,11 @@ class EmployeeBusinessService {
                 yearsDay.forEach { (k, v) ->
                     vacationDayPerYear = vacationDayPerYearService.findByYearAndEmployeeId(k, employee)
                     newDay = vacationDayPerYear.day - v
-                    println("$newDay ${vacationDayPerYear.day} $v testOpet")
-                    if (newDay > 0 && vacationDayPerYear.day!=0) {
+                    if (newDay > 0) {
                         vacationDayPerYearService.updateVacationDayPerYears(newDay, k, employee)
-                        println("testAdd $newDay $k")
                         usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
                     } else {
-                        throw ResponseStatusException(
+                        return throw ResponseStatusException(
                             HttpStatus.NOT_ACCEPTABLE, "Nemate dovoljno slobodnih dana odmora"
                         )
                     }
@@ -160,7 +161,6 @@ class EmployeeBusinessService {
             }
         }
 
-        println()
         return daysPerYearWithListDays
     }
 
