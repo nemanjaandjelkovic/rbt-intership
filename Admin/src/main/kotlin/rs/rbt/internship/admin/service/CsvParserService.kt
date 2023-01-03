@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import rs.rbt.internship.admin.exception.CsvColumnName
+import rs.rbt.internship.admin.exception.CsvMessageError
 import rs.rbt.internship.database.model.Employee
 import rs.rbt.internship.database.model.UsedVacation
 import rs.rbt.internship.database.model.VacationDayPerYear
@@ -39,7 +41,6 @@ class CsvParserService {
 
     //TODO:
     // VRACA JSON OBJEKTE KOJI NISU PROSLI
-    // TREBA DA BUDU STANDARDIZOVANE PORUKE
 
     fun csvParseEmployee(file: MultipartFile): MutableList<Employee> {
 
@@ -69,27 +70,26 @@ class CsvParserService {
                     } else {
                         throw ResponseStatusException(
                             HttpStatus.NOT_ACCEPTABLE,
-                            "Employee vec postoji, ostali koji ne postoje su uneti"
+                            CsvMessageError.EmployeeExists.message
                         )
                     }
                 } else {
                     throw ResponseStatusException(
-                        HttpStatus.PARTIAL_CONTENT, "Postoji problem sa formatom maila, ostalo koji su dobri su uneti, ostali podaci koji su u redu su uneti"
+                        HttpStatus.PARTIAL_CONTENT,
+                        CsvMessageError.WrongEmailFormat.message
                     )
                 }
-
             } else {
-                if (it.get(0) != "Employee Email" && it.get(1) != "Employee Password") {
-                    println(headers[0])
+                if (it.get(0) != CsvColumnName.Email.columnName && it.get(1) != CsvColumnName.Password.columnName) {
                     return throw ResponseStatusException(
-                        HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+                        HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
                     )
                 }
             }
         }
         return employees
     }
-
+        //PROVERA DATUMA IZ USED VACATION formatter
     fun csvParseUsedVacation(file: MultipartFile): MutableList<UsedVacation> {
 
         val fileRead = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
@@ -105,18 +105,23 @@ class CsvParserService {
         var day: MutableMap<String, Int>
         if (csvParser.headerNames.size != 3) {
             return throw ResponseStatusException(
-                HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+                HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
             )
         }
-        if (csvParser.headerNames[0] != "Employee" && csvParser.headerNames[1] != "Vacation start date" && csvParser.headerNames[2] != "Vacation end date") {
+        if (csvParser.headerNames[0] != CsvColumnName.Employee.columnName && csvParser.headerNames[1] != CsvColumnName.StartDate.columnName && csvParser.headerNames[2] != CsvColumnName.EndDate.columnName) {
             return throw ResponseStatusException(
-                HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+                HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
             )
         }
         csvRecords.forEach { it ->
+            if(it.size()!=3){
+                return throw ResponseStatusException(
+                    HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsvRow.message
+                )
+            }
             if (LocalDate.parse(it.get(1), formatter) > LocalDate.parse(it.get(2), formatter)) {
                 return throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, "Pogresno unesen vremenski period krajnji datum je manji od pocetnog"
+                    HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongDate.message
                 )
             }
             // if employee exists
@@ -153,19 +158,18 @@ class CsvParserService {
                         }
                     }
                 } else {
-                    throw ResponseStatusException(
-                        HttpStatus.PARTIAL_CONTENT, "Vec postoje odmori sa tim paramatrima, ostali su uneti koji ne postoje"
+                    return throw ResponseStatusException(
+                        HttpStatus.PARTIAL_CONTENT,
+                        CsvMessageError.UsedVacationExists.message
                     )
                 }
             } else {
-                throw ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Ne postoji taj employee"
+                return throw ResponseStatusException(
+                    HttpStatus.NOT_FOUND, CsvMessageError.NotFoundEmployee.message
                 )
             }
         }
-
         return usedVacations
-
     }
 
 
@@ -198,19 +202,18 @@ class CsvParserService {
                             employeeServices.saveEmployee(employee)
                         } else {
                             throw ResponseStatusException(
-                                HttpStatus.BAD_REQUEST, "Vec postoji zapis za tu godinu"
+                                HttpStatus.BAD_REQUEST, CsvMessageError.VacationDaysPerYearExists.message
                             )
                         }
                     } else {
                         throw ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Ne postoji taj employee"
+                            HttpStatus.NOT_FOUND, CsvMessageError.NotFoundEmployee.message
                         )
                     }
                 } else {
-                    if (it.get(0) != "Employee" && it.get(1) != "Total vacation days") {
-                        println(headers[0])
+                    if (it.get(0) != CsvColumnName.Employee.columnName && it.get(1) != CsvColumnName.TotalVacationDays.name) {
                         return throw ResponseStatusException(
-                            HttpStatus.NOT_ACCEPTABLE, "CSV FAIL IS ANOTHER"
+                            HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
                         )
                     }
                 }

@@ -12,11 +12,16 @@ import rs.rbt.internship.database.model.VacationDayPerYear
 import rs.rbt.internship.database.service.EmployeeService
 import rs.rbt.internship.database.service.UsedVacationService
 import rs.rbt.internship.database.service.VacationDayPerYearService
+import rs.rbt.internship.employee.exception.MessageError
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Service
 class EmployeeBusinessService {
+    companion object{
+        private const val dateFormat:String = "d/M/yyyy"
+    }
+
     @Autowired
     lateinit var employeeService: EmployeeService
 
@@ -36,6 +41,7 @@ class EmployeeBusinessService {
         employeeEmail: String
     ): MutableList<UsedVacation> {
 
+
         var usedVacations: MutableList<UsedVacation> = mutableListOf()
         val dateStartEnd: MutableList<LocalDate> = convertParameters(dateStart, dateEnd)
 
@@ -47,7 +53,7 @@ class EmployeeBusinessService {
             }
             else{
                 throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, "Pogresno unesen vremenski period krajnji datum je manji od pocetnog"
+                    HttpStatus.NOT_ACCEPTABLE, MessageError.WrongDate.message
                 )
             }
         } else {
@@ -62,17 +68,17 @@ class EmployeeBusinessService {
         employeeEmail: String
     ): Boolean {
         val emailValidated: Boolean = EmailValidator.getInstance().isValid(employeeEmail)
-        val dateStartValidated: Boolean = DateValidator.getInstance().isValid(dateStart,"d/M/yyyy")
-        val dateEndValidated: Boolean = DateValidator.getInstance().isValid(dateEnd,"d/M/yyyy")
-        if (employeeService.employeeExists(employeeEmail)) {
-            return emailValidated && dateEndValidated && dateStartValidated
+        val dateStartValidated: Boolean = DateValidator.getInstance().isValid(dateStart, dateFormat)
+        val dateEndValidated: Boolean = DateValidator.getInstance().isValid(dateEnd, dateFormat)
+        return if (employeeService.employeeExists(employeeEmail)) {
+            emailValidated && dateEndValidated && dateStartValidated
         } else {
-            return false
+            false
         }
     }
 
     fun convertParameters(dateStart: String, dateEnd: String): MutableList<LocalDate> {
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat)
         val dates: MutableList<LocalDate> = mutableListOf()
         dates.add(LocalDate.parse(dateStart, formatter))
         dates.add(LocalDate.parse(dateEnd, formatter))
@@ -102,20 +108,20 @@ class EmployeeBusinessService {
                         usedVacationService.saveUsedVacation(UsedVacation(0, dateStartEnd[0], dateStartEnd[1], employee))
                     } else {
                         return throw ResponseStatusException(
-                            HttpStatus.NOT_ACCEPTABLE, "Nemate dovoljno slobodnih dana odmora"
+                            HttpStatus.NOT_ACCEPTABLE, MessageError.DaysOut.message
                         )
                     }
                 }
             }
             else{
                 throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, "Pogresno unesen vremenski period krajnji datum je manji od pocetnog"
+                    HttpStatus.NOT_ACCEPTABLE, MessageError.WrongDate.message
                 )
             }
 
         } else {
             throw ResponseStatusException(
-                HttpStatus.NOT_ACCEPTABLE, "Neispravni podaci"
+                HttpStatus.NOT_ACCEPTABLE, MessageError.InvalidParameters.message
             )
         }
     }
