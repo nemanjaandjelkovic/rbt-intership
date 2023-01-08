@@ -1,9 +1,11 @@
 package rs.rbt.internship.admin.controller
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import rs.rbt.internship.admin.service.AdminService
+import rs.rbt.internship.database.model.Employee
 
 @RestController
 @RequestMapping("/admin")
@@ -14,7 +16,7 @@ class AdminController(){
 
     @PostMapping("/upload/employee")
     fun uploadEmployee(@RequestParam("file") file: MultipartFile) {
-        adminService.uploadEmployees(file)
+         adminService.uploadEmployees(file)
     }
 
     @PostMapping("/upload/used-vacation")

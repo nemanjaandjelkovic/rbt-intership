@@ -7,5 +7,4 @@ enum class CsvColumnName(val columnName:String) {
     EndDate("Vacation end date"),
     Employee("Employee"),
     TotalVacationDays("Total vacation days")
-
 }

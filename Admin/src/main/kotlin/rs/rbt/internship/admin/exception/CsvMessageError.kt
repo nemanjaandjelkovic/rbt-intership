@@ -11,4 +11,6 @@ enum class CsvMessageError(val message:String) {
     VacationDaysPerYearExists("VACATION DAY PER YEAR ALREADY EXISTS"),
     UsedVacationExists("VACATION ALREADY EXISTS")
 
+    // kao interface
+
 }
