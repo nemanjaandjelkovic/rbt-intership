@@ -3,8 +3,10 @@ package rs.rbt.internship.admin.security
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
+@Component
 class ApiKeyAuthFilter : OncePerRequestFilter() {
     companion object {
         private const val HEADER_NAME = "API-Key"
@@ -20,7 +22,6 @@ class ApiKeyAuthFilter : OncePerRequestFilter() {
         if (!isValidApiKey(apiKey)) {
             return response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid API Key")
         }
-
         return filterChain.doFilter(request, response)
     }
 
