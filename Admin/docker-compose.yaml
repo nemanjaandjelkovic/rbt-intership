@@ -1,0 +1,28 @@
+version: '3.0'
+
+services:
+  db:
+    image: 'postgres'
+    container_name: db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=UsedVacation
+  admin-service:
+    image: 'admin'
+    container_name: admin
+    build: ./
+    depends_on:
+      - db
+    ports:
+      - "8081:8081"
+  employee-service:
+    image: 'employee'
+    container_name: employee
+    build: ../employee
+    depends_on:
+      - db
+    ports:
+      - "8082:8082"
