@@ -1,5 +1,6 @@
 package rs.rbt.internship.admin.security
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -12,11 +13,13 @@ import java.util.*
 @EnableWebSecurity
 @Configuration
 class SecurityConfiguration {
-
+    @Autowired
+    lateinit var apiKeyAuthFilter:ApiKeyAuthFilter
     @Bean
     @Throws(Exception::class)
     @Override
     fun filterChain(http: HttpSecurity): SecurityFilterChain? {
+
         http
             .csrf().disable()
             .addFilterBefore(ApiKeyAuthFilter(), BasicAuthenticationFilter::class.java)
