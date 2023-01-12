@@ -4,35 +4,47 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import rs.rbt.internship.admin.exception.CustomException
+import rs.rbt.internship.admin.exception.CustomResponseEntity
 import rs.rbt.internship.admin.service.AdminService
-import rs.rbt.internship.database.model.Employee
 
 @RestController
 @RequestMapping("/admin")
-class AdminController(){
+class AdminController {
     @Autowired
     lateinit var adminService: AdminService
 
 
     @PostMapping("/upload/employee")
-    fun uploadEmployee(@RequestParam("file") file: MultipartFile) {
-         adminService.uploadEmployees(file)
+    fun uploadEmployee(@RequestParam("file") file: MultipartFile): ResponseEntity<List<Any>> {
+        val employees: CustomResponseEntity = adminService.uploadEmployees(file)
+        return ResponseEntity(employees.objects, employees.statusCode)
     }
 
     @PostMapping("/upload/used-vacation")
     @ResponseBody
-    fun uploadUsedVacation(@RequestParam("file") file: MultipartFile) {
-         adminService.uploadUsedVacations(file)
+    fun uploadUsedVacation(@RequestParam("file") file: MultipartFile): ResponseEntity<List<Any>> {
+        val usedVacations: CustomResponseEntity =
+            adminService.uploadUsedVacations(file)
+        return ResponseEntity(usedVacations.objects, usedVacations.statusCode)
+
     }
 
     @PostMapping("/upload/vacations")
-    fun uploadVacationDaysPerYear(@RequestParam("file") file: MutableList<MultipartFile>) {
-       adminService.uploadVacationDaysPerYear(file)
+    fun uploadVacationDaysPerYear(@RequestParam("file") file: MutableList<MultipartFile>): ResponseEntity<List<Any>> {
+        val vacationDaysPerYear: CustomResponseEntity = adminService.uploadVacationDaysPerYear(file)
+        return ResponseEntity(vacationDaysPerYear.objects, vacationDaysPerYear.statusCode)
     }
 
     @DeleteMapping("/deleteall")
     fun deleteAll() {
         adminService.deleteAll()
+    }
+
+    @ExceptionHandler(CustomException::class)
+    fun handleCustomException(exception: CustomException): ResponseEntity<CustomResponseEntity> {
+        val response = CustomResponseEntity(exception.status, exception.objects, exception.objects)
+        return ResponseEntity(response, exception.status)
     }
 
 }
