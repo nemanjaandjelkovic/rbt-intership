@@ -7,6 +7,3 @@ data class EmployeeResponseDto(
     val message: String
 )
 
-fun Employee.toResponse(employee:Employee,message: String):EmployeeResponseDto {
-    return EmployeeResponseDto(this,message)
-}

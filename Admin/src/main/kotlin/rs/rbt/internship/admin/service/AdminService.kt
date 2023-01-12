@@ -27,20 +27,20 @@ class AdminService {
 
     fun uploadEmployees(file: MultipartFile): CustomResponseEntity {
         val employees: CustomResponseEntity = csvParserService.csvParseEmployee(file)
-        employeeService.saveEmployees(employees.objects as MutableList<Employee>)
+        employeeService.saveEmployees(employees.saveObjects as MutableList<Employee>)
         return employees
 
     }
 
     fun uploadUsedVacations(file: MultipartFile): CustomResponseEntity {
         val usedVacations: CustomResponseEntity = csvParserService.csvParseUsedVacation(file)
-        usedVacationService.saveUsedVacations(usedVacations.objects as MutableList<UsedVacation>)
+        usedVacationService.saveUsedVacations(usedVacations.saveObjects as MutableList<UsedVacation>)
         return usedVacations
     }
 
     fun uploadVacationDaysPerYear(file: MutableList<MultipartFile>): CustomResponseEntity {
         val vacationDayPerYears: CustomResponseEntity = csvParserService.csvParseVacationDayPerYears(file)
-        vacationDayPerYearService.saveVacationDayPerYears(vacationDayPerYears.objects as MutableList<VacationDayPerYear>)
+        vacationDayPerYearService.saveVacationDayPerYears(vacationDayPerYears.saveObjects as MutableList<VacationDayPerYear>)
         return vacationDayPerYears
 
     }

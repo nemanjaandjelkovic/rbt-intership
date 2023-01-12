@@ -16,24 +16,24 @@ class AdminController {
 
 
     @PostMapping("/upload/employee")
-    fun uploadEmployee(@RequestParam("file") file: MultipartFile): ResponseEntity<CustomResponseEntity> {
+    fun uploadEmployee(@RequestParam("file") file: MultipartFile): ResponseEntity<List<Any>> {
         val employees: CustomResponseEntity = adminService.uploadEmployees(file)
-        return ResponseEntity(employees,employees.statusCode)
+        return ResponseEntity(employees.objects, employees.statusCode)
     }
 
     @PostMapping("/upload/used-vacation")
     @ResponseBody
-    fun uploadUsedVacation(@RequestParam("file") file: MultipartFile): ResponseEntity<CustomResponseEntity> {
+    fun uploadUsedVacation(@RequestParam("file") file: MultipartFile): ResponseEntity<List<Any>> {
         val usedVacations: CustomResponseEntity =
             adminService.uploadUsedVacations(file)
-        return ResponseEntity(usedVacations, usedVacations.statusCode)
+        return ResponseEntity(usedVacations.objects, usedVacations.statusCode)
 
     }
 
     @PostMapping("/upload/vacations")
-    fun uploadVacationDaysPerYear(@RequestParam("file") file: MutableList<MultipartFile>): ResponseEntity<CustomResponseEntity> {
+    fun uploadVacationDaysPerYear(@RequestParam("file") file: MutableList<MultipartFile>): ResponseEntity<List<Any>> {
         val vacationDaysPerYear: CustomResponseEntity = adminService.uploadVacationDaysPerYear(file)
-        return ResponseEntity(vacationDaysPerYear,vacationDaysPerYear.statusCode)
+        return ResponseEntity(vacationDaysPerYear.objects, vacationDaysPerYear.statusCode)
     }
 
     @DeleteMapping("/deleteall")
@@ -43,7 +43,7 @@ class AdminController {
 
     @ExceptionHandler(CustomException::class)
     fun handleCustomException(exception: CustomException): ResponseEntity<CustomResponseEntity> {
-        val response = CustomResponseEntity(exception.status, exception.message, exception.objects)
+        val response = CustomResponseEntity(exception.status, exception.objects, exception.objects)
         return ResponseEntity(response, exception.status)
     }
 
