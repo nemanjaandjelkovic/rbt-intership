@@ -17,14 +17,8 @@ class ApiKeyAuthFilter : GenericFilterBean() {
         val request: HttpServletRequest = request as HttpServletRequest
         val apiKey = request.getHeader("API-Key")
 
-
         if (!isValidApiKey(apiKey)) {
             return response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid API Key")
-        }
-        else{
-            val auth = UsernamePasswordAuthenticationToken("Admin", "pass", mutableListOf() )
-            SecurityContextHolder.getContext().authentication = auth
-            return filterChain.doFilter(request, response)
         }
         return filterChain.doFilter(request, response)
     }

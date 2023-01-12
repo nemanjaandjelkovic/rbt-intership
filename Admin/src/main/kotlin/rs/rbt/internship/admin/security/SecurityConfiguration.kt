@@ -13,8 +13,8 @@ import java.util.*
 @EnableWebSecurity
 @Configuration
 class SecurityConfiguration {
-    @Autowired
-    lateinit var apiKeyAuthFilter:ApiKeyAuthFilter
+
+    var apiKeyAuthFilter:ApiKeyAuthFilter = ApiKeyAuthFilter()
     @Bean
     @Throws(Exception::class)
     @Override
@@ -23,8 +23,6 @@ class SecurityConfiguration {
         http
             .csrf().disable()
             .addFilterBefore(ApiKeyAuthFilter(), BasicAuthenticationFilter::class.java)
-            .authorizeHttpRequests()
-            .anyRequest().authenticated().and().httpBasic()
         return http.build()
     }
 

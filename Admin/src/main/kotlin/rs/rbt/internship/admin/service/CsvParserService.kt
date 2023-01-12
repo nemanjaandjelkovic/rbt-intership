@@ -8,8 +8,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import rs.rbt.internship.admin.dto.toResponse
 import rs.rbt.internship.admin.exception.CsvColumnName
 import rs.rbt.internship.admin.exception.CsvMessageError
+import rs.rbt.internship.admin.exception.CustomException
+import rs.rbt.internship.admin.exception.CustomResponseEntity
 import rs.rbt.internship.database.model.Employee
 import rs.rbt.internship.database.model.UsedVacation
 import rs.rbt.internship.database.model.VacationDayPerYear
@@ -24,6 +27,8 @@ import java.time.format.DateTimeFormatter
 
 @Service
 class CsvParserService {
+    companion object;
+
     @Autowired
     lateinit var employeeServices: EmployeeService
 
@@ -38,11 +43,7 @@ class CsvParserService {
     @Autowired
     lateinit var usedVacationService: UsedVacationService
 
-
-    //TODO:
-    // VRACA JSON OBJEKTE KOJI NISU PROSLI
-
-    fun csvParseEmployee(file: MultipartFile): MutableList<Employee> {
+    fun csvParseEmployee(file: MultipartFile): CustomResponseEntity {
 
         val fileReader = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
         val csvParser = CSVParser(
@@ -52,10 +53,17 @@ class CsvParserService {
                 .withIgnoreEmptyLines()
                 .withTrim()
         )
+
+
         val headers: List<String> = csvParser.headerNames
 
+        //return params
         val employees: MutableList<Employee> = mutableListOf()
+        var message: String = CsvMessageError.ALL_VALID.message
+        var httpStatus: HttpStatus = HttpStatus.OK
+
         val csvRecords: Iterable<CSVRecord> = csvParser.records
+        val returnValue: MutableMap<HttpStatus, MutableList<Employee>> = mutableMapOf()
 
 
         csvRecords.forEach {
@@ -67,30 +75,26 @@ class CsvParserService {
                             password = it.get(1)
                         )
                         employees.add(employee)
+                       // employee.toResponse(employee,"SUCCES")
                     } else {
-                        throw ResponseStatusException(
-                            HttpStatus.NOT_ACCEPTABLE,
-                            CsvMessageError.EmployeeExists.message
-                        )
+                        httpStatus = HttpStatus.PARTIAL_CONTENT
+                        message = CsvMessageError.EMPLOYEE_EXISTS.message
                     }
                 } else {
-                    throw ResponseStatusException(
-                        HttpStatus.PARTIAL_CONTENT,
-                        CsvMessageError.WrongEmailFormat.message
-                    )
+                    httpStatus = HttpStatus.PARTIAL_CONTENT
+                    message = CsvMessageError.WRONG_EMAIL_FORMAT.message
                 }
             } else {
-                if (it.get(0) != CsvColumnName.Email.columnName && it.get(1) != CsvColumnName.Password.columnName) {
-                    return throw ResponseStatusException(
-                        HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
-                    )
+                if (it.get(0) != CsvColumnName.EMAIL.columnName && it.get(1) != CsvColumnName.PASSWORD.columnName) {
+                    throw CustomException(HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WRONG_CSV.message, employees)
                 }
             }
         }
-        return employees
+
+        return CustomResponseEntity(httpStatus, message, employees)
     }
-        //PROVERA DATUMA IZ USED VACATION formatter
-    fun csvParseUsedVacation(file: MultipartFile): MutableList<UsedVacation> {
+
+    fun csvParseUsedVacation(file: MultipartFile): CustomResponseEntity {
 
         val fileRead = BufferedReader(InputStreamReader(file.inputStream, "UTF-8"))
         val csvParser = CSVParser(
@@ -103,26 +107,31 @@ class CsvParserService {
         val csvRecords: Iterable<CSVRecord> = csvParser.records
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
         var day: MutableMap<String, Int>
+
+        //return params
+        val employees: MutableList<Employee> = mutableListOf()
+        var message: String = CsvMessageError.ALL_VALID.message
+        var httpStatus: HttpStatus = HttpStatus.OK
+
         if (csvParser.headerNames.size != 3) {
             return throw ResponseStatusException(
-                HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
+                HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WRONG_CSV.message
             )
         }
-        if (csvParser.headerNames[0] != CsvColumnName.Employee.columnName && csvParser.headerNames[1] != CsvColumnName.StartDate.columnName && csvParser.headerNames[2] != CsvColumnName.EndDate.columnName) {
+        if (csvParser.headerNames[0] != CsvColumnName.EMPLOYEE.columnName && csvParser.headerNames[1] != CsvColumnName.START_DATE.columnName && csvParser.headerNames[2] != CsvColumnName.END_DATE.columnName) {
             return throw ResponseStatusException(
-                HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
+                HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WRONG_CSV.message
             )
         }
         csvRecords.forEach { it ->
-            if(it.size()!=3){
+            if (it.size() != 3) {
                 return throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsvRow.message
+                    HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WRONG_CSV_ROW.message
                 )
             }
             if (LocalDate.parse(it.get(1), formatter) > LocalDate.parse(it.get(2), formatter)) {
-                return throw ResponseStatusException(
-                    HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongDate.message
-                )
+                message = CsvMessageError.WRONG_DATE.message
+                httpStatus = HttpStatus.NOT_ACCEPTABLE
             }
             // if employee exists
             if (employeeServices.employeeExists(it.get(0)) && parametersCheckService.checkEmail(it.get(0))) {
@@ -131,6 +140,7 @@ class CsvParserService {
                     dateEnd = LocalDate.parse(it.get(2), formatter),
                     employee = employeeServices.findEmployeeByEmail(it.get(0))
                 )
+                //usedVacations.add(usedVacation)
                 // if usedVacation exists (if not do =>)
                 if (!usedVacationService.existsUsedVacation(
                         usedVacation.dateStart,
@@ -138,13 +148,17 @@ class CsvParserService {
                         usedVacation.employee.email
                     )
                 ) {
+
                     day = usedVacationDaysService.getDaysBetweenDate(usedVacation.dateStart, usedVacation.dateEnd)
                     var yearDayLeft: VacationDayPerYear
 
+                    //GRESKA JE OVDE
                     day.forEach {
+                        println(it)
                         try {
                             yearDayLeft =
                                 usedVacationDayPerYearService.findByYearAndEmployeeId(it.key, usedVacation.employee)
+
                             if (yearDayLeft.day - it.value >= 0 && it.key == yearDayLeft.year) {
                                 usedVacations.add(usedVacation)
                                 usedVacationDayPerYearService.updateVacationDayPerYears(
@@ -154,27 +168,32 @@ class CsvParserService {
                                 )
                             }
                         } catch (e: Exception) {
-
+                            println("EXCEPTIONTEST")
                         }
                     }
+                    //GRESKA JE IZNAD
+
                 } else {
-                    return throw ResponseStatusException(
-                        HttpStatus.PARTIAL_CONTENT,
-                        CsvMessageError.UsedVacationExists.message
-                    )
+                    message = CsvMessageError.USED_VACATION_EXISTS.message
+                    httpStatus = HttpStatus.PARTIAL_CONTENT
                 }
             } else {
-                return throw ResponseStatusException(
-                    HttpStatus.NOT_FOUND, CsvMessageError.NotFoundEmployee.message
-                )
+                message = CsvMessageError.NOT_FOUND_EMPLOYEE.message
+                httpStatus = HttpStatus.NOT_FOUND
             }
         }
-        return usedVacations
+
+        return CustomResponseEntity(httpStatus, message, usedVacations)
     }
 
 
-    fun csvParseVacationDayPerYears(file: MutableList<MultipartFile>): MutableList<VacationDayPerYear> {
+    fun csvParseVacationDayPerYears(file: MutableList<MultipartFile>): CustomResponseEntity {
+
+        //return params
         val vacationDayPerYears: MutableList<VacationDayPerYear> = mutableListOf()
+        var message: String = CsvMessageError.ALL_VALID.message
+        var httpStatus: HttpStatus = HttpStatus.OK
+
         file.forEach { it ->
             val fileRead = BufferedReader(InputStreamReader(it.inputStream, "UTF-8"))
             val csvParser = CSVParser(
@@ -183,6 +202,7 @@ class CsvParserService {
             val headers: List<String> = csvParser.headerNames
             val csvRecords: Iterable<CSVRecord> = csvParser.records
             val employee = Employee()
+
             csvRecords.forEach {
                 if (it.recordNumber != 1L) {
                     //if employee exists and year have 4 char
@@ -201,25 +221,24 @@ class CsvParserService {
                             vacationDayPerYears.add(vacationDayPerYear)
                             employeeServices.saveEmployee(employee)
                         } else {
-                            throw ResponseStatusException(
-                                HttpStatus.BAD_REQUEST, CsvMessageError.VacationDaysPerYearExists.message
-                            )
+                            message = CsvMessageError.VACATION_DAYS_PER_YEAR_EXISTS.message
+                            httpStatus = HttpStatus.PARTIAL_CONTENT
                         }
                     } else {
-                        throw ResponseStatusException(
-                            HttpStatus.NOT_FOUND, CsvMessageError.NotFoundEmployee.message
-                        )
+                        message = CsvMessageError.NOT_FOUND_EMPLOYEE.message
+                        httpStatus = HttpStatus.PARTIAL_CONTENT
                     }
                 } else {
-                    if (it.get(0) != CsvColumnName.Employee.columnName && it.get(1) != CsvColumnName.TotalVacationDays.name) {
+                    if (it.get(0) != CsvColumnName.EMPLOYEE.columnName && it.get(1) != CsvColumnName.TOTAL_VACATION_DAYS.name) {
                         return throw ResponseStatusException(
-                            HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WrongCsv.message
+                            HttpStatus.NOT_ACCEPTABLE, CsvMessageError.WRONG_CSV.message
                         )
                     }
                 }
             }
         }
-        return vacationDayPerYears
+
+        return CustomResponseEntity(httpStatus, message, vacationDayPerYears)
     }
 
 
